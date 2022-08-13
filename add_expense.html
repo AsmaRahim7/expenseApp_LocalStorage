@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Finance Tracker App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link href="css/font-awesome.min.css" rel="stylesheet" />
+    <link href="css/jquery.mobile.min.css" rel="stylesheet" />
+    <link href="css/waves.min.css" rel="stylesheet" />
+    <link href="css/animate.css" rel="stylesheet" />
+    <link href="css/nativedroid2.css" rel="stylesheet" />
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+</head>
+<body>
+    <div data-role="page">
+        <!-- panel left -->
+        <div data-role="panel" id="leftpanel" data-display="overlay" data-position-fixed="true">
+            <div class='nd2-sidepanel-profile wow fadeInDown'>
+                <img class='profile-background' src="images/profileBackground.jpg" />
+                <div class="row">
+                    <div class='col-xs-4 center-xs'>
+                        <div class='box'>
+                            <img class="profile-thumbnail" src="images/profile.png" />
+                        </div>
+                    </div>
+                    <div class='col-xs-8'>
+                        <div class='box profile-text'>
+                            <strong>Finance Tracker</strong>
+                            <span class='subline' id="spName">Person Name</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ul data-role="listview" data-inset="false" data-icon="false">
+                <li><a href="profile.html" data-icon="false" rel="external"><i class="zmdi zmdi-home zmd-fw"></i>Home</a></li>
+                <li><a href="add_expense.html" data-icon="false" rel="external"><i class="zmdi zmdi-plus-circle-o-duplicate zmd-fw"></i>Add</a></li>
+                <li><a href="list.html" data-icon="false" rel="external"><i class="zmdi zmdi-format-list-bulleted zmd-fw"></i>Show All</a></li>
+                <li><a href="today_expenses.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar-check zmd-fw"></i>Show Today</a></li>
+                <li><a href="expense_date.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar zmd-fw"></i>Show by Date</a></li>
+                <li><a href="setting.html" data-icon="false" rel="external"><i class="zmdi zmdi-settings zmd-fw"></i>Setting</a></li>
+                <li><a href="#" id="lnkSignOut"><i class="zmdi zmdi-power-off zmd-fw"></i>Sign Out</a></li>
+            </ul>
+
+        </div>
+        <!-- /panel left -->
+
+        <div data-role="header" data-position="fixed" class="wow fadeInDown" data-wow-delay="0.2s">
+            <a href="#leftpanel" class="ui-btn ui-btn-left wow fadeIn" data-wow-delay='0.8s'><i class="zmdi zmdi-menu"></i></a>
+            <h1 class="wow fadeIn" data-wow-delay='0.4s'>Finance Tracker</h1>
+        </div>
+        <div role="main" class="ui-content" data-inset="false">
+            <form id="frmExpense">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <div class="box">
+                            <label for="txtTitle">Title:</label>
+                            <input type="text" required="required" name="txtTitle" id="txtTitle" value="" data-clear-btn="true" placeholder="Type your title here...">
+                            <label for="txtAmount">Amount:</label>
+                            <input type="number" step="0.01" required="required" name="txtAmount" id="txtAmount" value="" data-clear-btn="true" placeholder="">
+                            <label for="ddlExpType">Expense Type:</label>
+                            <select name="ddlExpType" id="ddlExpType" required="required" data-native-menu="false">
+                                <option value="">-- Select --</option>
+                                <option value="In-Comming">In-Comming</option>
+                                <option value="Out-Going">Out-Going</option>
+                            </select>
+                            <label for="txtDes">Description:</label>
+                            <textarea cols="40" rows="8" name="txtDes" id="txtDes" placeholder=""></textarea>
+                            <label for="txtDate">Date:</label>  <span style="font-size: .75rem;font-weight:bold">(Note: For today entry, no need to select date.)</span>
+                            <input type="date" name="txtDate" id="txtDate" required="required" data-clear-btn="true" placeholder="">
+                            <button id="btnAdd" class="ui-btn ui-btn-raised clr-primary" value="Add Expense" type="submit">Add Expense</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/jquery.mobile.min.js"></script>
+    <script src="js/waves.min.js"></script>
+    <script src="js/wow.min.js"></script>
+    <script src="js/nativedroid2.js"></script>
+    <script src="js/nd2settings.js"></script>
+    <script>
+        ///////////////////////////////////////////////////////////////////////////
+        var expense = null;
+        var expenseArray = [];
+
+        initDatabase();
+        function initDatabase()  // Function Call When Page is ready.
+        {
+            if (localStorage.getItem('expenses') !== null) {
+                expenseArray = JSON.parse(localStorage.getItem('expenses'))
+            }
+            expense = { expId: 0, expTitle: '', expType: '', expAmount: 0, expDescription: '', expDate: '' };
+        }
+       
+        var qs = location.hash.split('#');
+        if (qs.length > 1) {
+            editExpense();
+        }
+        function editExpense() {
+            var id = "";
+            if (qs[1].indexOf("id") != -1) {
+                id = qs[1].split("=");
+                let expIndex = expenseArray.findIndex(x => x.expId === parseInt(id[1]));
+                $('#txtTitle').val(expenseArray[expIndex].expTitle);
+                $('#txtDate').val(expenseArray[expIndex].expDate.split("/")[2] + "-" + expenseArray[expIndex].expDate.split("/")[1] + "-" + expenseArray[expIndex].expDate.split("/")[0]);
+                $('#txtAmount').val(expenseArray[expIndex].expAmount);
+                $('#ddlExpType-button').html('<span>' + expenseArray[expIndex].expType + '</span>');
+                $('#ddlExpType').val(expenseArray[expIndex].expType);
+                $('#txtDes').val(expenseArray[expIndex].expDescription);
+                $('#btnAdd').attr("expId", expenseArray[expIndex].expId);
+                $('#btnAdd').val("Update Expense");
+                $('#btnAdd').html("Update Expense");
+            }
+        }
+
+        $("#frmExpense").submit(function (e) {
+            e.preventDefault();
+            var insertedId = 0;
+            var postData = $('#frmExpense').serializeArray();
+            var date = "";
+            var todayDate = new Date();
+            if (postData[4].value == "") {
+                date = todayDate.toLocaleDateString("en-US").split("/");
+                date = date[1] + "/" + date[0] + "/" + date[2];
+            }
+            else {
+                date = postData[4].value.split("-");
+                date = date[2] + "/" + date[1] + "/" + date[0];
+            }
+            //alert(date);
+            if ($('#btnAdd').val() == "Add Expense") {
+                if (expenseArray.length > 0) {
+                    var id = Math.max(...expenseArray.map(o => o.expId), 0);
+                    id++;
+
+                    expense.expId = id;
+                    expense.expTitle = postData[0].value;
+                    expense.expAmount = parseFloat(postData[1].value);
+                    expense.expType = postData[2].value;
+                    expense.expDescription = postData[3].value;
+                    expense.expDate = date;
+
+                    expenseArray.push(expense);
+                }
+                else {
+                    expense = {};
+                    expense.expId = 1;
+                    expense.expTitle = postData[0].value;
+                    expense.expAmount = parseFloat(postData[1].value);
+                    expense.expType = postData[2].value;
+                    expense.expDescription = postData[3].value;
+                    expense.expDate = date;
+
+                    expenseArray.push(expense);
+                }
+            }
+            else {
+                var id = $('#btnAdd').attr("expId");
+                var id = $('#btnAdd').attr("expId");
+                let expIndex = expenseArray.findIndex(x => x.expId === parseInt(id));
+
+                expenseArray[expIndex].expTitle = postData[0].value;
+                expenseArray[expIndex].expAmount = parseFloat(postData[1].value);
+                expenseArray[expIndex].expType = postData[2].value;
+                expenseArray[expIndex].expDescription = postData[3].value;
+                expenseArray[expIndex].expDate = date;
+            }
+
+            localStorage.setItem('expenses', JSON.stringify(expenseArray));
+            onSuccess();
+        });
+
+        function onSuccess(tx, results) // Function for Hendeling Success...
+        {
+            //alert('saved successfully.');
+            location.href = "list.html";
+        }
+       
+    </script>
+</body>
+</html>
