@@ -82,20 +82,23 @@
     <script src="js/nativedroid2.js"></script>
     <script src="js/nd2settings.js"></script>
 
+    <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase.js"></script>
+    <script src="js/firebase.init.js"></script>
+
     <script>
-        new $.nd2Search({
-            placeholder: "Search",
-            defaultIcon: "globe-alt",
-            source: [
-                { "label": "Afghanistan", "value": "AF" },
-                { "label": "Zimbabwe", "value": "ZW" }
-            ],
-            fn: function (result) {
-                console.log('--- Your custom handling ---');
-                console.log('you picked: ');
-                console.log(result);
-            }
-        });
+        //new $.nd2Search({
+        //    placeholder: "Search",
+        //    defaultIcon: "globe-alt",
+        //    source: [
+        //        { "label": "Afghanistan", "value": "AF" },
+        //        { "label": "Zimbabwe", "value": "ZW" }
+        //    ],
+        //    fn: function (result) {
+        //        console.log('--- Your custom handling ---');
+        //        console.log('you picked: ');
+        //        console.log(result);
+        //    }
+        //});
 
 
         // Bar Chart Example 2
@@ -106,11 +109,31 @@
         };
 
         var expenseArray = [];
-        if (localStorage.getItem('expenses') !== null) {
-            expenseArray = JSON.parse(localStorage.getItem('expenses'))
+
+        loadExpenses()
+        function loadExpenses() {
+            var db = firebase.database().ref('expenses');
+            db.on('value', function (expenses) {
+                //alert(categories);
+                expenseArray = []
+                expenses.forEach(function (data) {
+                    if (data.val().isDeleted === false) {
+                        expenseArray.push(
+                            {
+                                expId: data.key,
+                                expTitle: data.val().expTitle,
+                                expType: data.val().expType,
+                                expAmount: data.val().expAmount,
+                                expDescription: data.val().expDescription,
+                                expDate: data.val().expDate,
+                            })
+                    }
+                });
+
+                getAllMonthExpense();
+            });
         }
 
-        getAllMonthExpense();
         function getAllMonthExpense() {
             if (expenseArray.length > 0) {
                 var serArrayOut = [];

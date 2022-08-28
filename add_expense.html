@@ -84,29 +84,48 @@
     <script src="js/wow.min.js"></script>
     <script src="js/nativedroid2.js"></script>
     <script src="js/nd2settings.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase.js"></script>
+    <script src="js/firebase.init.js"></script>
+
     <script>
         ///////////////////////////////////////////////////////////////////////////
-        var expense = null;
+        var expense = { expTitle: '', expType: '', expAmount: 0, expDescription: '', expDate: '', isDeleted: false };
         var expenseArray = [];
-
-        initDatabase();
-        function initDatabase()  // Function Call When Page is ready.
-        {
-            if (localStorage.getItem('expenses') !== null) {
-                expenseArray = JSON.parse(localStorage.getItem('expenses'))
-            }
-            expense = { expId: 0, expTitle: '', expType: '', expAmount: 0, expDescription: '', expDate: '' };
-        }
-       
         var qs = location.hash.split('#');
-        if (qs.length > 1) {
-            editExpense();
+
+        loadExpenses();
+        function loadExpenses()  // Function Call When Page is ready.
+        {
+            var db = firebase.database().ref('expenses');
+            db.on('value', function (expenses) {
+                //alert(categories);
+                expenseArray = []
+                expenses.forEach(function (data) {
+                    if (data.val().isDeleted === false) {
+                        expenseArray.push(
+                            {
+                                expId: data.key,
+                                expTitle: data.val().expTitle,
+                                expType: data.val().expType,
+                                expAmount: data.val().expAmount,
+                                expDescription: data.val().expDescription,
+                                expDate: data.val().expDate,
+                            })
+                    }
+                });
+                
+                if (qs.length > 1) {
+                    editExpense();
+                }
+            });
         }
+
         function editExpense() {
             var id = "";
             if (qs[1].indexOf("id") != -1) {
                 id = qs[1].split("=");
-                let expIndex = expenseArray.findIndex(x => x.expId === parseInt(id[1]));
+                let expIndex = expenseArray.findIndex(x => x.expId === id[1]);
                 $('#txtTitle').val(expenseArray[expIndex].expTitle);
                 $('#txtDate').val(expenseArray[expIndex].expDate.split("/")[2] + "-" + expenseArray[expIndex].expDate.split("/")[1] + "-" + expenseArray[expIndex].expDate.split("/")[0]);
                 $('#txtAmount').val(expenseArray[expIndex].expAmount);
@@ -135,45 +154,42 @@
             }
             //alert(date);
             if ($('#btnAdd').val() == "Add Expense") {
-                if (expenseArray.length > 0) {
-                    var id = Math.max(...expenseArray.map(o => o.expId), 0);
-                    id++;
+                expense.expTitle = postData[0].value;
+                expense.expAmount = parseFloat(postData[1].value);
+                expense.expType = postData[2].value;
+                expense.expDescription = postData[3].value;
+                expense.expDate = date;
+                expense.isDeleted = false;
 
-                    expense.expId = id;
-                    expense.expTitle = postData[0].value;
-                    expense.expAmount = parseFloat(postData[1].value);
-                    expense.expType = postData[2].value;
-                    expense.expDescription = postData[3].value;
-                    expense.expDate = date;
-
-                    expenseArray.push(expense);
-                }
-                else {
-                    expense = {};
-                    expense.expId = 1;
-                    expense.expTitle = postData[0].value;
-                    expense.expAmount = parseFloat(postData[1].value);
-                    expense.expType = postData[2].value;
-                    expense.expDescription = postData[3].value;
-                    expense.expDate = date;
-
-                    expenseArray.push(expense);
-                }
+                firebase.database().ref('expenses').push(expense
+                    , function (error) {
+                        if (error) alert(error);
+                        else {
+                            // do something
+                            onSuccess();
+                        }
+                    });
             }
             else {
                 var id = $('#btnAdd').attr("expId");
-                var id = $('#btnAdd').attr("expId");
-                let expIndex = expenseArray.findIndex(x => x.expId === parseInt(id));
 
-                expenseArray[expIndex].expTitle = postData[0].value;
-                expenseArray[expIndex].expAmount = parseFloat(postData[1].value);
-                expenseArray[expIndex].expType = postData[2].value;
-                expenseArray[expIndex].expDescription = postData[3].value;
-                expenseArray[expIndex].expDate = date;
+                expense.expTitle = postData[0].value;
+                expense.expAmount = parseFloat(postData[1].value);
+                expense.expType = postData[2].value;
+                expense.expDescription = postData[3].value;
+                expense.expDate = date;
+
+                firebase.database()
+                    .ref('expenses').child(id)
+                    .update(expense, function (error) {
+                        if (error) alert(error);
+                        else {
+                            // do something
+                            onSuccess();
+                        }
+                    });
             }
 
-            localStorage.setItem('expenses', JSON.stringify(expenseArray));
-            onSuccess();
         });
 
         function onSuccess(tx, results) // Function for Hendeling Success...
@@ -181,7 +197,7 @@
             //alert('saved successfully.');
             location.href = "list.html";
         }
-       
+
     </script>
 </body>
 </html>

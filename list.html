@@ -105,12 +105,38 @@
     <script src="js/nativedroid2.js"></script>
     <script src="js/nd2settings.js"></script>
     <script src="js/jquery.lineProgressbar.js"></script>
+
+
+    <script src="https://www.gstatic.com/firebasejs/6.4.2/firebase.js"></script>
+    <script src="js/firebase.init.js"></script>
+
     <script>
         var expenseArray = [];
-        if (localStorage.getItem('expenses') !== null) {
-            expenseArray = JSON.parse(localStorage.getItem('expenses'))
+        loadExpenses();
+        function loadExpenses()  // Function Call When Page is ready.
+        {
+            var db = firebase.database().ref('expenses');
+            db.on('value', function (expenses) {
+                //alert(categories);
+                expenseArray = []
+                expenses.forEach(function (data) {
+                    if (data.val().isDeleted === false) {
+                        expenseArray.push(
+                            {
+                                expId: data.key,
+                                expTitle: data.val().expTitle,
+                                expType: data.val().expType,
+                                expAmount: data.val().expAmount,
+                                expDescription: data.val().expDescription,
+                                expDate: data.val().expDate,
+                            })
+                    }
+                });
+
+                showAllExpenses();
+            });
         }
-        showAllExpenses();
+
         function showAllExpenses() {
             if (expenseArray.length > 0) {
                 var tbl = '';
@@ -128,9 +154,9 @@
                     tbl += '<tr>'
                         + statusRow
                         + ' <td><label>' + expenseArray[i].expTitle + '</label></td>'
-                        + ' <td><label>' + expenseArray[i].expAmount + '</label></td>'
+                        + ' <td><label>' + expenseArray[i].expAmount.toLocaleString() + '</label></td>'
                         + ' <td style="display:none"><label>' + expenseArray[i].expDescription + '</label></td>'
-                        + ' <td><a href="#" onclick="editExp(' + expenseArray[i].expId + ')" class="ui-btn ui-btn-inline ui-btn-fab ui-mini ui-btn-raised clr-primary"><i class="zmdi zmdi-edit zmd-1x"></i></a> <a onclick="getId(' + expenseArray[i].expId + ')" href="#popupDialog" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" class="ui-btn ui-btn-inline ui-btn-fab ui-mini ui-btn-raised clr-warning"><i class="zmdi zmdi-delete zmd-1x"></i></a></td>'
+                        + ' <td><a href="#" onclick="editExp(\'' + expenseArray[i].expId + '\')" class="ui-btn ui-btn-inline ui-btn-fab ui-mini ui-btn-raised clr-primary"><i class="zmdi zmdi-edit zmd-1x"></i></a> <a onclick="getId(\'' + expenseArray[i].expId + '\')" href="#popupDialog" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" class="ui-btn ui-btn-inline ui-btn-fab ui-mini ui-btn-raised clr-warning"><i class="zmdi zmdi-delete zmd-1x"></i></a></td>'
                         + '</tr>';
                 }
                 callProgressBars(OutAmount, inAmount);
@@ -145,7 +171,7 @@
                     + '</tr>';
                 callProgressBars(0, 0);
             }
-            
+
             $('#tblExpense').html(tbl);
         }
 
@@ -165,9 +191,16 @@
 
         function deleteExpense() {
             var id = $('#lnkDel').attr("eId");
-            var index = expenseArray.findIndex(x => x.expId === parseInt(id));
-            expenseArray.splice(index, 1);
-            localStorage.setItem('expenses', JSON.stringify(expenseArray));
+            firebase.database()
+                .ref('expenses').child(id)
+                .update({ isDeleted: true }
+                    , function (error) {
+                        if (error) alert(error);
+                        else {
+                            // do something
+                            onSuccess();
+                        }
+                    });
             onSuccess();
         }
         /////////////////////////////////////////////////////////////////
@@ -177,8 +210,8 @@
             var percentageOut = outAmount === 0 ? 0 : (outAmount / total) * 100;
             var percentageIn = inAmount === 0 ? 0 : (inAmount / total) * 100;
 
-            $('#spOutAmt').html(outAmount);
-            $('#spInAmt').html(inAmount);
+            $('#spOutAmt').html(outAmount.toLocaleString());
+            $('#spInAmt').html(inAmount.toLocaleString());
 
             $('#jqOut').LineProgressbar({
                 percentage: percentageOut,
@@ -197,7 +230,7 @@
         function onSuccess() // Function for Hendeling Success...
         {
             showMessage('Record Delete...');
-            showAllExpenses();
+            loadExpenses();
         }
 
         function showMessage(msg) {

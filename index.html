@@ -44,37 +44,37 @@
     <script src="js/nd2settings.js"></script>
 
     <script>
-        var user;
-        initDatabase();
-        function initDatabase()  // Function Call When Page is ready.
-        {
-            if (localStorage.getItem('user') != null) {
-                user = JSON.parse(localStorage.getItem('user'));
-            }
-            else {
-                user = null;
-            }
-        }
+        //var user;
+        //initDatabase();
+        //function initDatabase()  // Function Call When Page is ready.
+        //{
+        //    if (localStorage.getItem('user') != null) {
+        //        user = JSON.parse(localStorage.getItem('user'));
+        //    }
+        //    else {
+        //        user = null;
+        //    }
+        //}
 
-        ///////////////////
-        function userLogin() {
-            var postData = $('#frmLogin').serializeArray();
-            if (user.Email === postData[0].value && user.Password === postData[1].value) {
-                document.location.href = "profile.html";
-            }
-            else {
-                alert("Email or password is incorrect.");
-            }
-        }
+        /////////////////////
+        //function userLogin() {
+        //    var postData = $('#frmLogin').serializeArray();
+        //    if (user.Email === postData[0].value && user.Password === postData[1].value) {
+        //        document.location.href = "profile.html";
+        //    }
+        //    else {
+        //        alert("Email or password is incorrect.");
+        //    }
+        //}
 
-        function isUserExist() {
-            if (user !== null) {
-                userLogin();
-            }
-            else {
-                document.location.href = "profile.html";
-            }
-        }
+        //function isUserExist() {
+        //    if (user !== null) {
+        //        userLogin();
+        //    }
+        //    else {
+        //        document.location.href = "profile.html";
+        //    }
+        //}
     </script>
 </body>
 </html>
