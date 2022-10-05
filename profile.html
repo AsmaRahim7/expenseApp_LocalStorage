@@ -40,6 +40,7 @@
                 <li><a href="list.html" data-icon="false" rel="external"><i class="zmdi zmdi-format-list-bulleted zmd-fw"></i>Show All</a></li>
                 <li><a href="today_expenses.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar-check zmd-fw"></i>Show Today</a></li>
                 <li><a href="expense_date.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar zmd-fw"></i>Show by Date</a></li>
+                <li><a href="expense_month.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar zmd-fw"></i>Show by Month</a></li>
                 <li><a href="setting.html" data-icon="false" rel="external"><i class="zmdi zmdi-settings zmd-fw"></i>Setting</a></li>
                 <li><a href="#" id="lnkSignOut"><i class="zmdi zmdi-power-off zmd-fw"></i>Sign Out</a></li>
             </ul>
@@ -192,13 +193,13 @@
                             flag = true;
                             if (value == 0)
                                 return '';
-                            return Math.round(value / pc1_data.series.reduce(pc1_sum) * 100) + '% In (£' + value + ')';
+                            return Math.round(value / pc1_data.series.reduce(pc1_sum) * 100) + '% In (£' + value.toFixed(2) + ')';
                         }
                         else {
                             flag = false;
                             if (value == 0)
                                 return '';
-                            return Math.round(value / pc1_data.series.reduce(pc1_sum) * 100) + '% Out (£' + value + ')';
+                            return Math.round(value / pc1_data.series.reduce(pc1_sum) * 100) + '% Out (£' + value.toFixed(2) + ')';
 
                         }
                     }

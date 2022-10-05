@@ -39,6 +39,7 @@
                 <li><a href="list.html" data-icon="false" rel="external"><i class="zmdi zmdi-format-list-bulleted zmd-fw"></i>Show All</a></li>
                 <li><a href="today_expenses.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar-check zmd-fw"></i>Show Today</a></li>
                 <li><a href="expense_date.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar zmd-fw"></i>Show by Date</a></li>
+                <li><a href="expense_month.html" data-icon="false" rel="external"><i class="zmdi zmdi-calendar zmd-fw"></i>Show by Month</a></li>
                 <li><a href="setting.html" data-icon="false" rel="external"><i class="zmdi zmdi-settings zmd-fw"></i>Setting</a></li>
                 <li><a href="#" id="lnkSignOut"><i class="zmdi zmdi-power-off zmd-fw"></i>Sign Out</a></li>
             </ul>
@@ -144,7 +145,7 @@
                     var inAmount = 0, OutAmount = 0;
                     for (var i = 0; i < expenseArray.length; i++) {
                         var date = selDate.split("-");
-                        date = addZero(date[2]) + "/" + addZero(date[1]) + "/" + date[0];
+                        date = addZero(date[2]) + "/" + addZero(date[1]) + "/" + date[0]; //dd/MM/yyy
                         if (date == expenseArray[i].expDate) {
                             var statusRow = '';
                             if (expenseArray[i].expType == 'Out-Going') {
