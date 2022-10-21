@@ -115,6 +115,12 @@
     <script>
         var expenseArray = [];
         loadExpenses();
+
+        const date = new Date()
+        const month = ("0" + (date.getMonth() + 1)).slice(-2)
+        const year = date.getFullYear()
+        $('#txtDate').val(`${year}-${month}`);
+
         function loadExpenses()  // Function Call When Page is ready.
         {
             var db = firebase.database().ref('expenses');
