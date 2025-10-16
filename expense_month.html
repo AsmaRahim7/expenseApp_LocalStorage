@@ -80,7 +80,7 @@
                     <label for="jqRem" style="margin-top: -3%;">Remaining (<span id="spRemAmt"></span>)</label>
                     <div id="jqRem"></div>
                 </div>
-                
+
             </div>
         </div>
         <div data-role="popup" id="popupDialog">
@@ -265,7 +265,7 @@
                 percentage: remainingAmount <= 0 ? 0 : (remainingAmount / inAmount) * 100,
                 radius: '3px',
                 height: '5px',
-                fillBackgroundColor: remainingAmount < 0 ? 'red' : 'green'
+                fillBackgroundColor: remainingAmount < 0 ? 'yellow' : 'orange'
             }); // Remaining Amount
         }
         ///////////////////
