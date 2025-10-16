@@ -74,6 +74,10 @@
                     <label for="jqIn" style="margin-top: -10%;">In-Coming (<span id="spInAmt"></span>)</label>
                     <div id="jqIn"></div>
                 </div>
+                <div class="col-xs-10">
+                    <label for="jqRem" style="margin-top: -3%;">Remaining (<span id="spRemAmt"></span>)</label>
+                    <div id="jqRem"></div>
+                
             </div>
         </div>
         <div data-role="popup" id="popupDialog">
@@ -210,9 +214,11 @@
             var total = outAmount + inAmount;
             var percentageOut = outAmount === 0 ? 0 : (outAmount / total) * 100;
             var percentageIn = inAmount === 0 ? 0 : (inAmount / total) * 100;
+            var remainingAmount = inAmount - outAmount;
 
             $('#spOutAmt').html(outAmount.toLocaleString());
             $('#spInAmt').html(inAmount.toLocaleString());
+            $('#spRemAmt').html(remainingAmount.toLocaleString()); // Remaining Amount
 
             $('#jqOut').LineProgressbar({
                 percentage: percentageOut,
@@ -226,6 +232,13 @@
                 height: '5px',
                 fillBackgroundColor: '#009688'
             });
+            //remaining
+            $('#jqRem').LineProgressbar({
+                percentage: remainingAmount <= 0 ? 0 : (remainingAmount / inAmount) * 100,
+                radius: '3px',
+                height: '5px',
+                fillBackgroundColor: remainingAmount < 0 ? 'red' : 'green'
+            }); // Remaining Amount
         }
         /////////////////////////////////////////////////////////////////
         function onSuccess() // Function for Hendeling Success...
